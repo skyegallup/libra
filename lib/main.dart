@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:libra/views/home.dart';
+import 'package:libra/views/home/home.dart';
 
 void main() {
   runApp(const MyApp());
