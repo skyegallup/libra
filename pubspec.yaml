@@ -35,8 +35,7 @@ dependencies:
   http: ^1.6.0
   lucide_icons_flutter: ^3.1.5
   mix_annotations: ^1.7.0
-  get_it: ^9.0.5
-  watch_it: ^2.1.1
+  provider: ^6.1.5+1
 
 dev_dependencies:
   flutter_test:

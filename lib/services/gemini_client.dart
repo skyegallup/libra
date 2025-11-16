@@ -9,7 +9,7 @@ class GeminiClient {
     _assertUriValid(uri);
 
     // Send request
-    final socket = await Socket.connect(uri.host, uri.port);
+    final socket = await SecureSocket.connect(uri.host, uri.port, onBadCertificate: (_) => true);
     socket.encoding = utf8;
     socket.write("${uri.toString()}\r\n");
     await socket.flush();
@@ -17,20 +17,13 @@ class GeminiClient {
     // Wait for response
     // TODO: Try to parse the response header before we finish reading, so that we can reject invalid responses early
     final responseBuffer = StringBuffer();
-    socket.listen(
+    await socket.listen(
       (List<int> data) {
         final chunk = utf8.decode(data);
         responseBuffer.write(chunk);
-      },
-      onDone: () {
-        print('Connection closed.');
-        socket.destroy();
-      },
-      onError: (Object error, StackTrace stacktrace) {
-        print('Failed: $error. $stacktrace');
-        socket.destroy();
       }
-    );
+    ).asFuture();
+    await socket.close();
     final response = responseBuffer.toString();
 
     // Parse response
