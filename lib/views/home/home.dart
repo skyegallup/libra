@@ -1,7 +1,15 @@
 import 'package:flutter/widgets.dart';
 import 'package:libra/data/gemini_response.dart';
 import 'package:libra/services/gemini_client.dart';
+import 'package:libra/utils/gemtext_parser.dart';
+import 'package:libra/utils/models/heading_node.dart';
+import 'package:libra/utils/models/link_node.dart';
+import 'package:libra/utils/models/list_node.dart';
+import 'package:libra/utils/models/preformatted_text_node.dart';
+import 'package:libra/utils/models/quote_node.dart';
+import 'package:libra/utils/models/text_node.dart';
 import 'package:mix/mix.dart';
+import 'package:petitparser/petitparser.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,35 +22,143 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   Future<GeminiResponse>? _response;
   String url = 'gemini://m15o.midnight.pub';
-
+  
   @override
   Widget build(BuildContext context) {
     return VBox(
       style: Style(
-        $box.padding.all(16),
-        $flex.gap(16)
+        $box.color(Color.fromRGBO(29, 29, 34, 1)),
+        $flex.crossAxisAlignment.center()
       ),
       children: [
-        PressableBox(
-          onPress: () => _getCurrentUrl(context),
-          child: StyledText('request')
+        // Action bar
+        HBox(
+          style: Style(
+            $box.padding(16, 24),
+            $box.color(Color.fromRGBO(17, 17, 21, 1)),
+            $flex.mainAxisAlignment.center(),
+            $flex.crossAxisAlignment.center()
+          ),
+          children: [
+            PressableBox(
+              style: Style(
+                $box.padding(12, 20),
+                $box.color(Color.fromRGBO(29, 29, 34, 1)),
+                $box.width(720)
+              ),
+              onPress: () => _getCurrentUrl(context),
+              child: StyledText(url)
+            )
+          ]
         ),
-        FutureBuilder<GeminiResponse>(
-          future: _response,
-          builder: (BuildContext context, AsyncSnapshot<GeminiResponse> snapshot) {
-            if (snapshot.connectionState == ConnectionState.none) {
-              return StyledText('Request not yet sent.');
-            }
 
-            if (snapshot.hasData) {
-              return StyledText(snapshot.data!.content ?? '<no content>');
-            }
-            if (snapshot.hasError) {
-              return StyledText('Request failed.');
-            }
+        // Content
+        Box(
+          style: Style(
+            $box.maxWidth(752),
+            $box.padding(24, 16)
+          ),
+          child: FutureBuilder<GeminiResponse>(
+            future: _response,
+            builder: (BuildContext context, AsyncSnapshot<GeminiResponse> snapshot) {
+              if (snapshot.connectionState == ConnectionState.none) {
+                return StyledText('Request not yet sent.');
+              }
 
-            return StyledText('Waiting...');
-          },
+              if (snapshot.hasData) {
+                if (snapshot.data!.content == null) {
+                  return StyledText('<no content>');
+                }
+
+                final parsedResponse = gemtext.parse(snapshot.data!.content!);
+                if (parsedResponse is Failure) {
+                  print(parsedResponse);
+                  return StyledText('<failed to parse context>');
+                }
+
+                return VBox(
+                  style: Style(
+                    $flex.gap(10),
+                    $flex.crossAxisAlignment.start()
+                  ),
+                  children: parsedResponse.value.map((node) {
+                    switch (node) {
+                      case final TextNode textNode:
+                        return StyledText(textNode.text);
+                      case final LinkNode linkNode:
+                        return PressableBox(
+                          child: StyledText(
+                            linkNode.label ?? linkNode.uri,
+                            style: Style(
+                              $text.color(Color.fromRGBO(142, 183, 236, 1)),
+                              $text.fontWeight.w500()
+                            )
+                          )
+                        );
+                      case final HeadingNode headingNode:
+                        switch (headingNode.level) {
+                          case 1:
+                            return StyledText(
+                              headingNode.text,
+                              style: Style(
+                                $text.fontSize(40),
+                                $text.fontWeight.w700()
+                              )
+                            );
+                          case 2:
+                            return StyledText(
+                              headingNode.text,
+                              style: Style(
+                                $text.fontSize(26),
+                                $text.fontWeight.w700()
+                              )
+                            );
+                          case 3:
+                            return StyledText(
+                              headingNode.text,
+                              style: Style(
+                                $text.fontWeight.w700()
+                              )
+                            );
+                          default:
+                            throw Error();
+                        }
+                      case final PreformattedTextNode preNode:
+                        return StyledText(
+                          preNode.text,
+                          style: Style(
+                            $text.fontFamily('monospace')
+                          )
+                        );
+                      case final ListNode listNode:
+                        return Box(
+                          style: Style(
+                            $box.padding.left(8)
+                          ),
+                          child: StyledText('• ${listNode.text}')
+                        );
+                      case final QuoteNode quoteNode:
+                        return Box(
+                          style: Style(
+                            $box.padding.all(8),
+                            $box.border.left.width(4),
+                            $box.border.left.color(Color.fromRGBO(136, 136, 136, 1))
+                          ),
+                          child: StyledText(quoteNode.text)
+                        );
+                      default:
+                        throw Error();
+                    }
+                  }).toList()
+                );
+              }
+              if (snapshot.hasError) {
+                return StyledText('Request failed.');
+              }
+
+              return StyledText('Waiting...');
+            },
+          )
         )
       ]
     );

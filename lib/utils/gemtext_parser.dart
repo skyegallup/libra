@@ -59,4 +59,4 @@ final quoteLine = seq4(
 ).map4((_, _, text, _) => QuoteNode(text));
 
 final gemtextLine = [linkLine, preformattedLine, headingLine, listLine, quoteLine, textLine].toChoiceParser();
-final gemtext = gemtextLine.star().end();
+final gemtext = gemtextLine.star();

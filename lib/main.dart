@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 import 'package:libra/services/gemini_client.dart';
-import 'package:libra/utils/gemtext_parser.dart';
 import 'package:libra/views/home/home.dart';
 import 'package:provider/provider.dart';
 
@@ -13,10 +12,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final res = gemtext.parse('hi');
-    print(res);
-    print(res.value);
-
     // TODO: Add MixTheme
     return MultiProvider(
       providers: [
