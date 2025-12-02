@@ -44,7 +44,7 @@ class GeminiClient {
     if (meta.length > 1024) {
       throw FormatException('Server response is invalid.');
     }
-
+    
     return GeminiResponse(
       content: content,
       meta: meta,
