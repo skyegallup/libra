@@ -1,4 +1,5 @@
 import 'package:libra/utils/gemtext_parser.dart';
+import 'package:libra/utils/models/gemtext_node.dart';
 import 'package:libra/utils/models/heading_node.dart';
 import 'package:libra/utils/models/link_node.dart';
 import 'package:libra/utils/models/list_node.dart';
@@ -9,45 +10,49 @@ import 'package:petitparser/petitparser.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('Text line is parsed correctly', () {
-    final str = 'hello world!';
-    final res = textLine.parse(str);
+  group('textLine', () {
+    test(' parses text lines correctly', () {
+      final str = 'hello world!';
+      final res = textLine.parse(str);
 
-    expect(res, TypeMatcher<Success>());
-    expect(res.value, TypeMatcher<TextNode>());
-    expect(res.value.text, str);
+      expect(res, TypeMatcher<Success>());
+      expect(res.value, TypeMatcher<TextNode>());
+      expect(res.value.text, str);
+    });
+
+    test(' parses blank lines correctly', () {
+      final str = '';
+      final res = textLine.parse(str);
+
+      expect(res, TypeMatcher<Success>());
+      expect(res.value, TypeMatcher<TextNode>());
+      expect(res.value.text, str);
+    });
+  });
+  
+  group('linkLine', () {
+    test(' parses links without labels correctly', () {
+      final str = '=> gemini://geminiprotocol.net';
+      final res = linkLine.parse(str);
+
+      expect(res, TypeMatcher<Success>());
+      expect(res.value, TypeMatcher<LinkNode>());
+      expect(res.value.uri, 'gemini://geminiprotocol.net');
+      expect(res.value.label, null);
+    });
+
+    test(' parses links with labels correctly', () {
+      final str = '=> gemini://geminiprotocol.net Label';
+      final res = linkLine.parse(str);
+
+      expect(res, TypeMatcher<Success>());
+      expect(res.value, TypeMatcher<LinkNode>());
+      expect(res.value.uri, 'gemini://geminiprotocol.net');
+      expect(res.value.label, 'Label');
+    });
   });
 
-  test('Blank line is parsed correctly', () {
-    final str = '';
-    final res = textLine.parse(str);
-
-    expect(res, TypeMatcher<Success>());
-    expect(res.value, TypeMatcher<TextNode>());
-    expect(res.value.text, str);
-  });
-
-  test('Link line without label is parsed correctly', () {
-    final str = '=> gemini://geminiprotocol.net';
-    final res = linkLine.parse(str);
-
-    expect(res, TypeMatcher<Success>());
-    expect(res.value, TypeMatcher<LinkNode>());
-    expect(res.value.uri, 'gemini://geminiprotocol.net');
-    expect(res.value.label, null);
-  });
-
-  test('Link line with label is parsed correctly', () {
-    final str = '=> gemini://geminiprotocol.net Label';
-    final res = linkLine.parse(str);
-
-    expect(res, TypeMatcher<Success>());
-    expect(res.value, TypeMatcher<LinkNode>());
-    expect(res.value.uri, 'gemini://geminiprotocol.net');
-    expect(res.value.label, 'Label');
-  });
-
-  test('Preformatted lines are parsed correctly', () {
+  test('performattedLine parses preformatted lines correctly', () {
     final str = '```json\r\n["a", "b", "c"]\r\n```';
     final res = preformattedLine.parse(str);
 
@@ -56,37 +61,39 @@ void main() {
     expect(res.value.text, '["a", "b", "c"]'); 
   });
 
-  test('First-level heading is parsed correctly', () {
-    final str = '# Heading';
-    final res = headingLine.parse(str);
+  group('headingLine', () {
+    test(' parses first-level headings correctly', () {
+      final str = '# Heading';
+      final res = headingLine.parse(str);
 
-    expect(res, TypeMatcher<Success>());
-    expect(res.value, TypeMatcher<HeadingNode>());
-    expect(res.value.level, 1);
-    expect(res.value.text, 'Heading');
+      expect(res, TypeMatcher<Success>());
+      expect(res.value, TypeMatcher<HeadingNode>());
+      expect(res.value.level, 1);
+      expect(res.value.text, 'Heading');
+    });
+
+    test(' parses second-level headings correctly', () {
+      final str = '## Heading';
+      final res = headingLine.parse(str);
+
+      expect(res, TypeMatcher<Success>());
+      expect(res.value, TypeMatcher<HeadingNode>());
+      expect(res.value.level, 2);
+      expect(res.value.text, 'Heading');
+    });
+
+    test(' parses third-level headings correctly', () {
+      final str = '### Heading';
+      final res = headingLine.parse(str);
+
+      expect(res, TypeMatcher<Success>());
+      expect(res.value, TypeMatcher<HeadingNode>());
+      expect(res.value.level, 3);
+      expect(res.value.text, 'Heading');
+    });
   });
 
-  test('Second-level heading is parsed correctly', () {
-    final str = '## Heading';
-    final res = headingLine.parse(str);
-
-    expect(res, TypeMatcher<Success>());
-    expect(res.value, TypeMatcher<HeadingNode>());
-    expect(res.value.level, 2);
-    expect(res.value.text, 'Heading');
-  });
-
-  test('Third-level heading is parsed correctly', () {
-    final str = '### Heading';
-    final res = headingLine.parse(str);
-
-    expect(res, TypeMatcher<Success>());
-    expect(res.value, TypeMatcher<HeadingNode>());
-    expect(res.value.level, 3);
-    expect(res.value.text, 'Heading');
-  });
-
-  test('List line is parsed correctly', () {
+  test('listLine parses list lines correctly', () {
     final str = '* hello world!';
     final res = listLine.parse(str);
 
@@ -95,12 +102,85 @@ void main() {
     expect(res.value.text, 'hello world!');
   });
 
-  test('Quote line is parsed correctly', () {
+  test('quoteLine parses quote lines correctly', () {
     final str = '> hello world!';
     final res = quoteLine.parse(str);
 
     expect(res, TypeMatcher<Success>());
     expect(res.value, TypeMatcher<QuoteNode>());
     expect(res.value.text, 'hello world!');
+  });
+
+  group('gemtextLine', () {
+    test(' selects text lines correctly', () {
+      final str = 'hello world!';
+      final res = gemtextLine.parse(str);
+
+      expect(res, TypeMatcher<Success>());
+      expect(res.value, TypeMatcher<TextNode>());
+    });
+
+    test(' selects link lines correctly', () {
+      final str = '=> gemini://geminiprotocol.net';
+      final res = gemtextLine.parse(str);
+
+      expect(res, TypeMatcher<Success>());
+      expect(res.value, TypeMatcher<LinkNode>());
+    });
+
+    test(' selects preformatted text lines correctly', () {
+      final str = '```json\r\n["a", "b", "c"]\r\n```';
+      final res = gemtextLine.parse(str);
+
+      expect(res, TypeMatcher<Success>());
+      expect(res.value, TypeMatcher<PreformattedTextNode>());
+    });
+
+    test(' selects heading lines correctly', () {
+      final str = '# Heading';
+      final res = gemtextLine.parse(str);
+
+      expect(res, TypeMatcher<Success>());
+      expect(res.value, TypeMatcher<HeadingNode>());
+    });
+
+    test(' selects list lines correctly', () {
+      final str = '* hello world!';
+      final res = gemtextLine.parse(str);
+
+      expect(res, TypeMatcher<Success>());
+      expect(res.value, TypeMatcher<ListNode>());
+    });
+
+    test(' selects quote nodes correctly', () {
+      final str = '> hello world!';
+      final res = gemtextLine.parse(str);
+
+      expect(res, TypeMatcher<Success>());
+      expect(res.value, TypeMatcher<QuoteNode>());
+    });
+  });
+
+  group('gemtext', () {
+    test(' parses a single line correctly', () {
+      final str = 'hi!';
+      final res = gemtext.parse(str);
+
+      expect(res, TypeMatcher<Success>());
+      expect(res.value, TypeMatcher<List<GemtextNode>>());
+      expect(res.value.length, 1);
+      expect(res.value[0], TypeMatcher<TextNode>());
+    });
+
+    test(' parses multiple lines correctly', () {
+      final str = 'hi!\r\n```json\r\n["a", "b", "c"]\r\n```';
+      final res = gemtext.parse(str);
+
+      expect(res, TypeMatcher<Success>());
+      expect(res.value, TypeMatcher<List<GemtextNode>>());
+      expect(res.value.length, 2);
+      expect(res.value[0], TypeMatcher<TextNode>());
+      expect(res.value[1], TypeMatcher<PreformattedTextNode>());
+    });
   });
 }

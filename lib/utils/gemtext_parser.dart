@@ -48,5 +48,5 @@ final quoteLine = seq3(
   any().plusString()
 ).map3((_, _, text) => QuoteNode(text));
 
-final gemtextLine = [textLine, linkLine, preformattedLine, headingLine, listLine, quoteLine].toChoiceParser();
+final gemtextLine = [linkLine, preformattedLine, headingLine, listLine, quoteLine, textLine].toChoiceParser();
 final gemtext = gemtextLine.starSeparated(newline()).map((sepList) => sepList.elements);
