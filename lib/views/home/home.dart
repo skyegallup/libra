@@ -70,7 +70,11 @@ class _HomePageState extends State<HomePage> {
                   return StyledText('<no content>');
                 }
 
-                final parsedResponse = gemtext.parse(snapshot.data!.content!);
+                var content = snapshot.data!.content!;
+                if (!content.endsWith('\r\n')) {
+                  content += '\r\n';
+                }
+                final parsedResponse = gemtext.parse(content);
                 if (parsedResponse is Failure) {
                   print(parsedResponse);
                   return StyledText('<failed to parse context>');
@@ -166,6 +170,7 @@ class _HomePageState extends State<HomePage> {
 
   void _getCurrentUrl(BuildContext context) {
     setState(() {
+      print('sending req...');
       _response = Provider.of<GeminiClient>(context, listen: false).get(url);
     });
   }
