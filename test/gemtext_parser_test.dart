@@ -12,27 +12,27 @@ import 'package:test/test.dart';
 void main() {
   group('textLine', () {
     test(' parses text lines correctly', () {
-      final str = 'hello world!';
+      final str = 'hello world!\r\n';
       final res = textLine.parse(str);
 
       expect(res, TypeMatcher<Success>());
       expect(res.value, TypeMatcher<TextNode>());
-      expect(res.value.text, str);
+      expect(res.value.text, 'hello world!');
     });
 
     test(' parses blank lines correctly', () {
-      final str = '';
+      final str = '\r\n';
       final res = textLine.parse(str);
 
       expect(res, TypeMatcher<Success>());
       expect(res.value, TypeMatcher<TextNode>());
-      expect(res.value.text, str);
+      expect(res.value.text, '');
     });
   });
   
   group('linkLine', () {
     test(' parses links without labels correctly', () {
-      final str = '=> gemini://geminiprotocol.net';
+      final str = '=> gemini://geminiprotocol.net\r\n';
       final res = linkLine.parse(str);
 
       expect(res, TypeMatcher<Success>());
@@ -42,7 +42,8 @@ void main() {
     });
 
     test(' parses links with labels correctly', () {
-      final str = '=> gemini://geminiprotocol.net Label';
+      final str = '=> gemini://geminiprotocol.net Label\r\n';
+      //final res = trace(linkLine).parse(str);
       final res = linkLine.parse(str);
 
       expect(res, TypeMatcher<Success>());
@@ -53,7 +54,7 @@ void main() {
   });
 
   test('performattedLine parses preformatted lines correctly', () {
-    final str = '```json\r\n["a", "b", "c"]\r\n```';
+    final str = '```json\r\n["a", "b", "c"]\r\n```\r\n';
     final res = preformattedLine.parse(str);
 
     expect(res, TypeMatcher<Success>());
@@ -63,7 +64,7 @@ void main() {
 
   group('headingLine', () {
     test(' parses first-level headings correctly', () {
-      final str = '# Heading';
+      final str = '# Heading\r\n';
       final res = headingLine.parse(str);
 
       expect(res, TypeMatcher<Success>());
@@ -73,7 +74,7 @@ void main() {
     });
 
     test(' parses second-level headings correctly', () {
-      final str = '## Heading';
+      final str = '## Heading\r\n';
       final res = headingLine.parse(str);
 
       expect(res, TypeMatcher<Success>());
@@ -83,7 +84,7 @@ void main() {
     });
 
     test(' parses third-level headings correctly', () {
-      final str = '### Heading';
+      final str = '### Heading\r\n';
       final res = headingLine.parse(str);
 
       expect(res, TypeMatcher<Success>());
@@ -94,7 +95,7 @@ void main() {
   });
 
   test('listLine parses list lines correctly', () {
-    final str = '* hello world!';
+    final str = '* hello world!\r\n';
     final res = listLine.parse(str);
 
     expect(res, TypeMatcher<Success>());
@@ -103,7 +104,7 @@ void main() {
   });
 
   test('quoteLine parses quote lines correctly', () {
-    final str = '> hello world!';
+    final str = '> hello world!\r\n';
     final res = quoteLine.parse(str);
 
     expect(res, TypeMatcher<Success>());
@@ -113,7 +114,7 @@ void main() {
 
   group('gemtextLine', () {
     test(' selects text lines correctly', () {
-      final str = 'hello world!';
+      final str = 'hello world!\r\n';
       final res = gemtextLine.parse(str);
 
       expect(res, TypeMatcher<Success>());
@@ -121,7 +122,7 @@ void main() {
     });
 
     test(' selects link lines correctly', () {
-      final str = '=> gemini://geminiprotocol.net';
+      final str = '=> gemini://geminiprotocol.net\r\n';
       final res = gemtextLine.parse(str);
 
       expect(res, TypeMatcher<Success>());
@@ -129,7 +130,7 @@ void main() {
     });
 
     test(' selects preformatted text lines correctly', () {
-      final str = '```json\r\n["a", "b", "c"]\r\n```';
+      final str = '```json\r\n["a", "b", "c"]\r\n```\r\n';
       final res = gemtextLine.parse(str);
 
       expect(res, TypeMatcher<Success>());
@@ -137,7 +138,7 @@ void main() {
     });
 
     test(' selects heading lines correctly', () {
-      final str = '# Heading';
+      final str = '# Heading\r\n';
       final res = gemtextLine.parse(str);
 
       expect(res, TypeMatcher<Success>());
@@ -145,7 +146,7 @@ void main() {
     });
 
     test(' selects list lines correctly', () {
-      final str = '* hello world!';
+      final str = '* hello world!\r\n';
       final res = gemtextLine.parse(str);
 
       expect(res, TypeMatcher<Success>());
@@ -153,7 +154,7 @@ void main() {
     });
 
     test(' selects quote nodes correctly', () {
-      final str = '> hello world!';
+      final str = '> hello world!\r\n';
       final res = gemtextLine.parse(str);
 
       expect(res, TypeMatcher<Success>());
@@ -163,7 +164,7 @@ void main() {
 
   group('gemtext', () {
     test(' parses a single line correctly', () {
-      final str = 'hi!';
+      final str = 'hi!\r\n';
       final res = gemtext.parse(str);
 
       expect(res, TypeMatcher<Success>());
@@ -173,7 +174,7 @@ void main() {
     });
 
     test(' parses multiple lines correctly', () {
-      final str = 'hi!\r\n```json\r\n["a", "b", "c"]\r\n```';
+      final str = 'hi!\r\n```json\r\n["a", "b", "c"]\r\n```\r\n';
       final res = gemtext.parse(str);
 
       expect(res, TypeMatcher<Success>());

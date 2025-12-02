@@ -6,47 +6,57 @@ import 'package:libra/utils/models/quote_node.dart';
 import 'package:libra/utils/models/text_node.dart';
 import 'package:petitparser/petitparser.dart';
 
-final textLine = any().starString().map((text) => TextNode(text));
 
-final linkLine = seq3(
+// Reference: gemini://geminiprotocol.net/docs/gemtext-specification.gmi
+
+
+final textLine = seq2(
+  any().starLazy(newline()).flatten(),
+  newline()
+).map2((text, _) => TextNode(text));
+
+final linkLine = seq5(
   string('=>'),
   whitespace().plus(),
-  [
-    seq3(
-      any().plusLazy(whitespace()).flatten(),
-      whitespace().plus(),
-      any().plusString()
-    ).map3((url, _, label) => LinkNode(url, label)),
-    any().plusString().map((str) => LinkNode(str, null))
-  ].toChoiceParser()
-).map3((_, _, node) => node);
+  any().plusLazy(whitespace()).flatten(),
+  seq3(
+    whitespace().plus(),
+    any().plusLazy(newline()).flatten(),
+    whitespace().plusLazy(newline())
+  ).map3((_, label, _) => label.trim()).optional(),
+  newline()
+).map5((_, _, uri, label, _) => LinkNode(uri, label));
 
-final preformattedLine = seq6(
+final preformattedLine = seq7(
   string('```'),
   any().plusLazy(newline()).flatten().optional(),
   newline(),
   any().plusLazy(newline().seq(string('```'))).flatten(),
   newline().seq(string('```')),
-  any().starLazy(newline()).optional()
-).map6((_, altText, _, text, _, _) => PreformattedTextNode(text, altText));
+  any().starLazy(newline()).optional(),
+  newline()
+).map7((_, altText, _, text, _, _, _) => PreformattedTextNode(text, altText));
 
-final headingLine = seq3(
+final headingLine = seq4(
   char('#').repeat(1, 3).map((strs) => strs.length),
   whitespace().star(),
-  any().plusString()
-).map3((level, _, text) => HeadingNode(level, text));
+  any().starLazy(newline()).flatten(),
+  newline()
+).map4((level, _, text, _) => HeadingNode(level, text));
 
-final listLine = seq3(
+final listLine = seq4(
   char('*'),
   whitespace().star(),
-  any().plusString()
-).map3((_, _, text) => ListNode(text));
+  any().starLazy(newline()).flatten(),
+  newline()
+).map4((_, _, text, _) => ListNode(text));
 
-final quoteLine = seq3(
+final quoteLine = seq4(
   char('>'),
   whitespace().star(),
-  any().plusString()
-).map3((_, _, text) => QuoteNode(text));
+  any().starLazy(newline()).flatten(),
+  newline()
+).map4((_, _, text, _) => QuoteNode(text));
 
 final gemtextLine = [linkLine, preformattedLine, headingLine, listLine, quoteLine, textLine].toChoiceParser();
-final gemtext = gemtextLine.starSeparated(newline()).map((sepList) => sepList.elements);
+final gemtext = gemtextLine.star().end();
