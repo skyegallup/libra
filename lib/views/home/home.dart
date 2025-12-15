@@ -21,7 +21,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Future<GeminiResponse>? _response;
-  String url = 'gemini://m15o.midnight.pub';
+  String url = 'gemini://skyebound.gay';
   
   @override
   Widget build(BuildContext context) {
