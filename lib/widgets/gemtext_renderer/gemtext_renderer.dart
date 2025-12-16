@@ -20,7 +20,7 @@ class GemtextRenderer extends StatelessWidget {
   Widget build(BuildContext context) {
     return VBox(
       style: Style(
-        $flex.gap(10),
+        $flex.gap(4),
         $flex.crossAxisAlignment.start()
       ),
       children: nodes.map((node) => _mapNodeToWidget(node)).toList()

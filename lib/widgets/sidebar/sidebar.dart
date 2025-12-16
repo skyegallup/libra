@@ -29,7 +29,7 @@ class Sidebar extends StatelessWidget {
             style: Style(
               ButtonSpecUtility.self.flex.mainAxisAlignment.start()
             ),
-            variant: ButtonVariant.normal,
+            variant: ButtonVariant.outlined,
             label: 'skyebound.gay',
             onPressed: () => print('todo'),
           ),
