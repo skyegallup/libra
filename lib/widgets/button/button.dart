@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:libra/widgets/button/button_spec.dart';
+import 'package:libra/widgets/button/button_styles.dart';
 import 'package:libra/widgets/button/button_variants.dart';
 import 'package:mix/mix.dart';
 
@@ -27,7 +28,7 @@ class LibraButton extends StatelessWidget {
       onPress: disabled ? null : onPressed,
       enabled: !disabled,
       child: SpecBuilder(
-        style: null,
+        style: buttonStyle(style, variant),
         builder: (context) {
           final button = ButtonSpec.of(context);
           return button.container(

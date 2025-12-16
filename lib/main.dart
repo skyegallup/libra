@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:libra/services/gemini_client.dart';
+import 'package:libra/utils/themes/theme_light_blue.dart';
 import 'package:libra/views/home/home.dart';
 import 'package:mix/mix.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
         Provider(create: (_) => GeminiClient())
       ],
       child: MixTheme(
-        data: MixThemeData.empty(),
+        data: themeLightBlue,
         child: WidgetsApp(
           title: 'Libra',
           home: const HomePage(),
