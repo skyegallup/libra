@@ -8,6 +8,7 @@ import 'package:libra/utils/models/list_node.dart';
 import 'package:libra/utils/models/preformatted_text_node.dart';
 import 'package:libra/utils/models/quote_node.dart';
 import 'package:libra/utils/models/text_node.dart';
+import 'package:libra/utils/themes/theme_tokens.dart';
 import 'package:mix/mix.dart';
 
 class GemtextRenderer extends StatelessWidget {
@@ -29,14 +30,20 @@ class GemtextRenderer extends StatelessWidget {
   Widget _mapNodeToWidget(GemtextNode node) {
     switch (node) {
       case final TextNode textNode:
-        return StyledText(textNode.text);
+        return StyledText(
+          textNode.text,
+          style: Style(
+            $text.color.ref($tok.color.white),
+            $text.style.ref($tok.textStyle.body)
+          )
+        );
       case final LinkNode linkNode:
         return PressableBox(
           child: StyledText(
             linkNode.label ?? linkNode.uri,
             style: Style(
-              $text.color(Color.fromRGBO(142, 183, 236, 1)),
-              $text.fontWeight.w500()
+              $text.color.ref($tok.color.primaryLighter),
+              $text.style.ref($tok.textStyle.body)
             )
           )
         );
@@ -46,23 +53,24 @@ class GemtextRenderer extends StatelessWidget {
             return StyledText(
               headingNode.text,
               style: Style(
-                $text.fontSize(40),
-                $text.fontWeight.w700()
+                $text.color.ref($tok.color.white),
+                $text.style.ref($tok.textStyle.heading1)
               )
             );
           case 2:
             return StyledText(
               headingNode.text,
               style: Style(
-                $text.fontSize(26),
-                $text.fontWeight.w700()
+                $text.color.ref($tok.color.white),
+                $text.style.ref($tok.textStyle.heading2)
               )
             );
           case 3:
             return StyledText(
               headingNode.text,
               style: Style(
-                $text.fontWeight.w700()
+                $text.color.ref($tok.color.white),
+                $text.style.ref($tok.textStyle.heading3)
               )
             );
           default:
@@ -72,24 +80,38 @@ class GemtextRenderer extends StatelessWidget {
         return StyledText(
           preNode.text,
           style: Style(
-            $text.fontFamily('monospace')
+            $text.color.ref($tok.color.white),
+            $text.style.ref($tok.textStyle.body)  // TODO: Add pre text style
           )
         );
       case final ListNode listNode:
         return Box(
           style: Style(
+            $text.color.ref($tok.color.white),
             $box.padding.left(8)
           ),
-          child: StyledText('• ${listNode.text}')
+          child: StyledText(
+            '• ${listNode.text}',
+            style: Style(
+              $text.color.ref($tok.color.white),
+              $text.style.ref($tok.textStyle.body)
+            )
+          )
         );
       case final QuoteNode quoteNode:
         return Box(
           style: Style(
             $box.padding.all(8),
             $box.border.left.width(4),
-            $box.border.left.color(Color.fromRGBO(136, 136, 136, 1))
+            $box.border.left.color.ref($tok.color.primaryLighter)
           ),
-          child: StyledText(quoteNode.text)
+          child: StyledText(
+            quoteNode.text,
+            style: Style(
+              $text.color.ref($tok.color.white),
+              $text.style.ref($tok.textStyle.quote)
+            )
+          )
         );
       default:
         throw Error();
