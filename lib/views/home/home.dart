@@ -6,6 +6,8 @@ import 'package:libra/services/gemini_client.dart';
 import 'package:libra/utils/gemtext_parser.dart';
 import 'package:libra/widgets/gemtext_renderer/gemtext_renderer.dart';
 import 'package:libra/widgets/sidebar/sidebar.dart';
+import 'package:libra/widgets/text_field/text_field.dart';
+import 'package:libra/widgets/text_field/text_field_spec.dart';
 import 'package:mix/mix.dart';
 import 'package:petitparser/petitparser.dart';
 import 'package:provider/provider.dart';
@@ -39,14 +41,25 @@ class _HomePageState extends State<HomePage> {
             $flex.crossAxisAlignment.center()
           ),
           children: [
-            PressableBox(
+            //PressableBox(
+            //  style: Style(
+            //    $box.padding(12, 20),
+            //    $box.color(Color.fromRGBO(29, 29, 34, 1)),
+            //    $box.width(720)
+            //  ),
+            //  onPress: () => _getCurrentUrl(context),
+            //  child: StyledText(url)
+            //)
+            LibraTextField(
               style: Style(
-                $box.padding(12, 20),
-                $box.color(Color.fromRGBO(29, 29, 34, 1)),
-                $box.width(720)
+                TextFieldSpecUtility.self.container.width(720)
               ),
-              onPress: () => _getCurrentUrl(context),
-              child: StyledText(url)
+              onSubmitted: (value) {
+                setState(() {
+                  url = value;
+                });
+                _getCurrentUrl(context);
+              }
             )
           ]
         ),

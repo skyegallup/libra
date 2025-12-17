@@ -5,7 +5,7 @@ import 'package:mix_annotations/mix_annotations.dart';
 part 'button_spec.g.dart';
 
 @MixableSpec()
-class ButtonSpec extends Spec<ButtonSpec> with _$ButtonSpec  {
+class ButtonSpec extends Spec<ButtonSpec> with _$ButtonSpec {
   final FlexSpec flex;
   final BoxSpec container;
   final IconSpec icon;
