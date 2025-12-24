@@ -1,0 +1,43 @@
+=> gemini://skyebound.gay/
+
+# An introduction
+
+> Now playing: "Real Annie" by Slaughter Beach, Dog
+
+Hello, reader! I want to introduce myself and talk about what this blog is for, and why I'm choosing to build it on the slow internet as opposed to a regular website.
+
+## Who I am
+
+My name is Skye (she/they), and I am... well, a lot of things. Professionally, I'm a software developer and a UI/UX developer, and a recent college graduate. I'm currently working as a developer at a small generative AI technology startup in the U.S. - and before you ask, no, I'm not even remotely an advocate for the tools I help build. (I feel bad that I have to follow up any explanation of what I do for a living with an apology, but it is what it is until I can find something better.)
+
+Personally, I am an avid fan of sustainability, especially regarding technology and computing. I love learning about how we can do more with less, and how we can use better technology to do the same things *better* instead of simply doing *more*. That's one of the main things that drove me to investigate Gemini and the rest of the slow internet. I was captivated by the idea of a tiny web protocol that anyone can implement, and that would enable browsers and servers to run on even the oldest devices. I didn't learn about the other benefits of using a "slow" medium for social interaction until later.
+
+I'm a big fan of cooking, baking, cycling, video games and board games, and anything that involves trinkets. I am trying to become a gardener and a baker, but I'm not very good at either yet.
+
+I'm also not a very good writer, which begs the question - why start a blog?
+
+## My goals with this blog
+
+I'm not entirely sure what I want out of this experience yet. I was initially setting it up to practice my sysadmin skills (this capsule is proudly hosted on an old workstation under my TV), but I want it to be more than that.
+
+I want this blog to be a way for me to connect with like-minded people: other creatives, developers, and folks who are tired of what the internet's turned into. I used to use social media like Reddit and Instagram to connect - and still use Discord for that today - but I think that a blog might be a better way for me to put my thoughts out into the world. Social media is all but designed to prevent meaningful, thorough, or constructive interaction, so I'm hoping that this works better for me.
+
+(On that note - I encourage y'all to connect with me if you have any comments, or if you simply want to chat. It would make my day!: me [at] skyebound [dot] gay)
+
+I'm also using this blog as a way to practice my writing skills. My mother and my sister are both avid writers, as a couple of my closest friends. They've all inspired me to try sharing my own thoughts like this, even though I've historically been a pretty mediocre writer at best.
+
+## What I plan to post
+
+I mostly plan to write about tech and sustainability, since those are two of my biggest passions, but I may also write some slice-of-life-y posts too. I can also guarantee some generative AI hateposting - like Ed Zitron, but more vibes- and experience-based.
+
+=> https://www.wheresyoured.at/ (We can only hope that this man is right about Big Tech reaching the "finding out" phase soon...)
+
+Most likely, all of those topics will blend together a bit, since everything's connected in one way or another
+
+
+---
+
+Published 2025-12-11.
+
+Written with love, not with AI.
+Contact: me [at] skyebound [dot] gay
