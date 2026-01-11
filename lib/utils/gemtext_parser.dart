@@ -9,6 +9,8 @@ import 'package:petitparser/petitparser.dart';
 
 // Reference: gemini://geminiprotocol.net/docs/gemtext-specification.gmi
 
+final wsp = [char(String.fromCharCode(0x40)), char(String.fromCharCode(0x09))].toChoiceParser();
+
 
 final textLine = seq2(
   any().starLazy(newline()).flatten(),
@@ -17,12 +19,12 @@ final textLine = seq2(
 
 final linkLine = seq5(
   string('=>'),
-  whitespace().plus(),
-  any().plusLazy(whitespace()).flatten(),
+  wsp.star(),
+  any().plusLazy(wsp).flatten(),
   seq3(
-    whitespace().plus(),
+    wsp.plus(),
     any().plusLazy(newline()).flatten(),
-    whitespace().plusLazy(newline())
+    wsp.plusLazy(newline())
   ).map3((_, label, _) => label.trim()).optional(),
   newline()
 ).map5((_, _, uri, label, _) => LinkNode(uri, label));
