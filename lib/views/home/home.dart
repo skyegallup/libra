@@ -9,7 +9,6 @@ import 'package:libra/widgets/sidebar/sidebar.dart';
 import 'package:libra/widgets/text_field/text_field.dart';
 import 'package:libra/widgets/text_field/text_field_spec.dart';
 import 'package:mix/mix.dart';
-import 'package:petitparser/petitparser.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -99,16 +98,11 @@ class _HomePageState extends State<HomePage> {
                             }
 
                             var content = snapshot.data!.content!;
-                            if (!content.endsWith('\r\n')) {
-                              content += '\r\n';
-                            }
-                            final parsedResponse = gemtext.parse(content);
-                            if (parsedResponse is Failure) {
-                              print(parsedResponse);
-                              return StyledText('<failed to parse context>');
-                            }
+                            
+                            var parser = GemtextParser();
 
-                            return GemtextRenderer(nodes: UnmodifiableListView(parsedResponse.value));
+                            final parsedResponse = parser.parse(content);
+                            return GemtextRenderer(nodes: UnmodifiableListView(parsedResponse));
                           }
                           if (snapshot.hasError) {
                             return StyledText('Request failed.');

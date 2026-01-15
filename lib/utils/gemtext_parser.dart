@@ -1,64 +1,92 @@
+import 'package:libra/utils/models/gemtext_node.dart';
 import 'package:libra/utils/models/heading_node.dart';
 import 'package:libra/utils/models/link_node.dart';
 import 'package:libra/utils/models/list_node.dart';
 import 'package:libra/utils/models/preformatted_text_node.dart';
 import 'package:libra/utils/models/quote_node.dart';
 import 'package:libra/utils/models/text_node.dart';
-import 'package:petitparser/petitparser.dart';
 
+class GemtextParser {
+	List<GemtextNode> parse(String str) {
+		// Set up output and state
+		List<GemtextNode> nodes = [];
 
-// Reference: gemini://geminiprotocol.net/docs/gemtext-specification.gmi
+		bool isInPreformattedMode = false;
+		String? currentPreText = null;
+		String? currentPreAltText = null;
 
-final wsp = [char(String.fromCharCode(0x40)), char(String.fromCharCode(0x09))].toChoiceParser();
+		// Parse line-by-line
+		var lines = str.split(RegExp('\n'));
+		if (lines[lines.length - 1] == '') {
+			lines = lines.sublist(0, lines.length - 1);
+		}
 
+		for (var line in lines) {
+			// Handle pre-formatted mode
+			if (isInPreformattedMode) {
+				if (line.startsWith('```')) {
+					nodes.add(PreformattedTextNode(currentPreText!, currentPreAltText));
+					
+					isInPreformattedMode = false;
+					currentPreText = null;
+					currentPreAltText = null;
 
-final textLine = seq2(
-  any().starLazy(newline()).flatten(),
-  newline()
-).map2((text, _) => TextNode(text));
+					continue;
+				} else {
+					currentPreText = currentPreText! + line;
+					continue;
+				}
+			}
 
-final linkLine = seq5(
-  string('=>'),
-  wsp.star(),
-  any().plusLazy(wsp).flatten(),
-  seq3(
-    wsp.plus(),
-    any().plusLazy(newline()).flatten(),
-    wsp.plusLazy(newline())
-  ).map3((_, label, _) => label.trim()).optional(),
-  newline()
-).map5((_, _, uri, label, _) => LinkNode(uri, label));
+			if (line.startsWith('=>')) {
+				var regex = RegExp(r'^=>[ \t]*([^\s]+)[ \t]*(.*)?$', multiLine: true);
+				var match = regex.firstMatch(line);
+				if (match != null) {
+					nodes.add(LinkNode(match[1]!, match[2]));
+					continue;
+				}
+			}
 
-final preformattedLine = seq7(
-  string('```'),
-  any().plusLazy(newline()).flatten().optional(),
-  newline(),
-  any().plusLazy(newline().seq(string('```'))).flatten(),
-  newline().seq(string('```')),
-  any().starLazy(newline()).optional(),
-  newline()
-).map7((_, altText, _, text, _, _, _) => PreformattedTextNode(text, altText));
+			if (line.startsWith('```')) {
+				var followingText = line.substring(3).trim();
+				var altText = followingText.length > 0 ? followingText : null;
 
-final headingLine = seq4(
-  char('#').repeat(1, 3).map((strs) => strs.length),
-  whitespace().star(),
-  any().starLazy(newline()).flatten(),
-  newline()
-).map4((level, _, text, _) => HeadingNode(level, text));
+				isInPreformattedMode = true;
+				currentPreAltText = altText;
+				currentPreText = '';
+				continue;
+			}
 
-final listLine = seq4(
-  char('*'),
-  whitespace().star(),
-  any().starLazy(newline()).flatten(),
-  newline()
-).map4((_, _, text, _) => ListNode(text));
+			if (line.startsWith('#')) {
+				var level = 1;
+				if (line[1] == '#') {
+					level = 2;
+					if (line[2] == '#') {
+						level = 3;
+					}
+				}
 
-final quoteLine = seq4(
-  char('>'),
-  whitespace().star(),
-  any().starLazy(newline()).flatten(),
-  newline()
-).map4((_, _, text, _) => QuoteNode(text));
+				var text = line.substring(level).trim();
+				nodes.add(HeadingNode(level, text));
+				continue;
+			}
 
-final gemtextLine = [linkLine, preformattedLine, headingLine, listLine, quoteLine, textLine].toChoiceParser();
-final gemtext = gemtextLine.star();
+			if (line.startsWith('* ')) {
+				var text = line.substring(2).trim();
+				nodes.add(ListNode(text));
+				continue;
+			}
+
+			if (line.startsWith('>')) {
+				var text = line.substring(1).trim();
+				nodes.add(QuoteNode(text));
+				continue;
+			}
+
+			// Assume all other lines are text nodes
+			nodes.add(TextNode(line));
+		}
+
+		return nodes;
+	}
+}
