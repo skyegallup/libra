@@ -102,7 +102,15 @@ class _HomePageState extends State<HomePage> {
                             var parser = GemtextParser();
 
                             final parsedResponse = parser.parse(content);
-                            return GemtextRenderer(nodes: UnmodifiableListView(parsedResponse));
+                            return GemtextRenderer(
+                              nodes: UnmodifiableListView(parsedResponse),
+                              onNavigate: (uri) {
+                                setState(() {
+                                  this.url = uri;
+                                  this._getCurrentUrl(context);
+                                });
+                              },
+                            );
                           }
                           if (snapshot.hasError) {
                             return StyledText('Request failed.');

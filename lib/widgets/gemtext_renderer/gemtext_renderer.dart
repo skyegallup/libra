@@ -12,9 +12,14 @@ import 'package:libra/utils/themes/theme_tokens.dart';
 import 'package:mix/mix.dart';
 
 class GemtextRenderer extends StatelessWidget {
-  const GemtextRenderer({super.key, required this.nodes});
+  const GemtextRenderer({
+    super.key,
+    required this.nodes,
+    required this.onNavigate
+  });
 
   final UnmodifiableListView<GemtextNode> nodes;
+  final void Function(String uri) onNavigate;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +44,7 @@ class GemtextRenderer extends StatelessWidget {
         );
       case final LinkNode linkNode:
         return PressableBox(
+          onPress: () => this.onNavigate(linkNode.uri),
           child: StyledText(
             linkNode.label ?? linkNode.uri,
             style: Style(
