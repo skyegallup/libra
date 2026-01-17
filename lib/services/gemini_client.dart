@@ -1,15 +1,29 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:libra/data/gemini_request_event.dart';
 import 'package:libra/data/gemini_response.dart';
+import 'package:libra/data/loading_state.dart';
 
 class GeminiClient {
-  Future<GeminiResponse> get(String url) async {
+  final bool _addDemoWaits = false;
+
+  Stream<GeminiRequestEvent> get(String url) async* {
     final uri = _getNormalizedUri(url);
     _assertUriValid(uri);
 
-    // Send request
+    // Connect to server
+    yield GeminiRequestEvent(LoadingState.connecting, null);
+    if (_addDemoWaits) {
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
     final socket = await SecureSocket.connect(uri.host, uri.port, onBadCertificate: (_) => true);
+
+    // Send request
+    yield GeminiRequestEvent(LoadingState.dataTransfer, null);
+    if (_addDemoWaits) {
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
     socket.encoding = utf8;
     socket.write("${uri.toString()}\r\n");
     await socket.flush();
@@ -45,10 +59,13 @@ class GeminiClient {
       throw FormatException('Server response is invalid.');
     }
     
-    return GeminiResponse(
-      content: content,
-      meta: meta,
-      statusCodeInt: statusCodeInt
+    yield GeminiRequestEvent(
+      LoadingState.complete,
+        GeminiResponse(
+        content: content,
+        meta: meta,
+        statusCodeInt: statusCodeInt
+      )
     );
   }
 
