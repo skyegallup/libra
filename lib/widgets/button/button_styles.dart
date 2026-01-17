@@ -12,6 +12,7 @@ final _icon = _util.icon;
 Style get _baseStyle => Style(
   _container.borderRadius.all.ref($tok.radius.buttonRadius),
   _container.padding.directional(8, 20),
+  _container.height(50),
 
   _flex.gap(8),
   _flex.mainAxisAlignment.center(),
@@ -23,31 +24,39 @@ Style get _baseStyle => Style(
   _icon.size(24)
 );
 
+Style get _onHover => Style(
+  _container.color.ref($tok.color.grayDark)
+);
 Style get _normalStyle => Style(
   _container.color.ref($tok.color.grayDarker),
   _label.color.ref($tok.color.white),
-  _icon.color.ref($tok.color.white)
+  _icon.color.ref($tok.color.white),
+
+  $on.hover(_onHover)
 );
 
+Style get _onHoverLight => Style(
+  _container.color.ref($tok.color.gray)
+);
 Style get _normalLightStyle => Style(
   _container.color.ref($tok.color.grayDark),
   _label.color.ref($tok.color.white),
-  _icon.color.ref($tok.color.white)
+  _icon.color.ref($tok.color.white),
+
+  $on.hover(_onHoverLight)
 );
 
 Style get _outlinedStyle => Style(
   _normalStyle,
   _container.border.width(2),
-  _container.border.color.ref($tok.color.grayLight)
+  _container.border.color.ref($tok.color.grayLight),
+
+  $on.hover(_onHover)
 );
 
 Style get _onDisabled => Style(
   _label.color.darken(50),
   _icon.color.darken(50)
-);
-
-Style get _onHover => Style(
-  _container.color.ref($tok.color.grayDark)
 );
 
 Style buttonStyle(Style? style, ButtonVariant? variant) {
@@ -58,7 +67,6 @@ Style buttonStyle(Style? style, ButtonVariant? variant) {
     ButtonVariant.normalLight(_normalLightStyle),
     ButtonVariant.outlined(_outlinedStyle),
 
-    $on.disabled(_onDisabled),
-    $on.hover(_onHover)
+    $on.disabled(_onDisabled)
   ).applyVariant(variant).merge(style);
 }

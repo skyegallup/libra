@@ -8,8 +8,10 @@ final _value = _util.value;
 
 Style get _baseStyle => Style(
   _container.borderRadius.all.ref($tok.radius.buttonRadius),
-  _container.padding.directional(12, 20),
+  _container.padding.directional(8, 20),
+  _container.alignment.directional.centerStart(),
   _container.color.ref($tok.color.grayDark),
+  _container.height(50),
 
   _value.style.ref($tok.textStyle.link),
   _value.color.ref($tok.color.white)
