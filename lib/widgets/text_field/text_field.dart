@@ -8,11 +8,15 @@ import 'package:mix/mix.dart';
 class LibraTextField extends StatefulWidget {
   const LibraTextField({
     super.key,
+    this.defaultValue = '',
+    this.controller,
     this.onChanged,
     this.onSubmitted,
     this.style
   });
 
+  final String defaultValue;
+  final TextEditingController? controller;
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
   final Style? style;
@@ -22,8 +26,10 @@ class LibraTextField extends StatefulWidget {
 }
 
 class _LibraTextField extends State<LibraTextField> {
-  final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+
+  late TextEditingController _controller;
+  late bool _isOwnController;
 
   String _value = '';
 
@@ -34,6 +40,15 @@ class _LibraTextField extends State<LibraTextField> {
   @override
   void initState() {
     super.initState();
+
+    _value = widget.defaultValue;
+    if (widget.controller != null) {
+      _controller = widget.controller!;
+      _isOwnController = false;
+    } else {
+      _controller = TextEditingController();
+      _isOwnController = true;
+    }
 
     _controller.addListener(() {
       final newValue = _controller.text;
@@ -52,8 +67,11 @@ class _LibraTextField extends State<LibraTextField> {
   void dispose() {
     super.dispose();
 
-    _controller.dispose();
     _focusNode.dispose();
+
+    if (_isOwnController) {
+      _controller.dispose();
+    }
   }
 
   @override

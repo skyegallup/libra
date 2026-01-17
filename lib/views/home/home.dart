@@ -20,7 +20,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Future<GeminiResponse>? _response;
-  String url = 'gemini://skyebound.gay/posts/an-introduction.gmi';
+  String url = '';
+  final TextEditingController _urlController = TextEditingController();
   
   @override
   Widget build(BuildContext context) {
@@ -50,13 +51,13 @@ class _HomePageState extends State<HomePage> {
             //  child: StyledText(url)
             //)
             LibraTextField(
+              defaultValue: url,
+              controller: _urlController,
               style: Style(
                 TextFieldSpecUtility.self.container.width(720)
               ),
               onSubmitted: (value) {
-                setState(() {
-                  url = value;
-                });
+                _setUrl(value);
                 _getCurrentUrl(context);
               }
             )
@@ -105,10 +106,8 @@ class _HomePageState extends State<HomePage> {
                             return GemtextRenderer(
                               nodes: UnmodifiableListView(parsedResponse),
                               onNavigate: (uri) {
-                                setState(() {
-                                  this.url = uri;
-                                  this._getCurrentUrl(context);
-                                });
+                                _setUrl(uri);
+                                _getCurrentUrl(context);
                               },
                             );
                           }
@@ -131,9 +130,20 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _getCurrentUrl(BuildContext context) {
+    if (url == '') {
+      return;
+    }
+    
     setState(() {
       print('sending req...');
       _response = Provider.of<GeminiClient>(context, listen: false).get(url);
+    });
+  }
+
+  void _setUrl(String url) {
+    setState(() {
+      this.url = url;
+      this._urlController.text = url;
     });
   }
 }
