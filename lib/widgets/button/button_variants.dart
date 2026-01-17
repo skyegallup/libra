@@ -4,5 +4,6 @@ class ButtonVariant extends Variant {
   const ButtonVariant._(super.name);
 
   static const normal = ButtonVariant._('normal');
+  static const normalLight = ButtonVariant._('normalLight');
   static const outlined = ButtonVariant._('outlined');
 }

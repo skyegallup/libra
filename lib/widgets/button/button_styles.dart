@@ -11,7 +11,7 @@ final _icon = _util.icon;
 
 Style get _baseStyle => Style(
   _container.borderRadius.all.ref($tok.radius.buttonRadius),
-  _container.padding.directional(12, 20),
+  _container.padding.directional(8, 20),
 
   _flex.gap(8),
   _flex.mainAxisAlignment.center(),
@@ -25,6 +25,12 @@ Style get _baseStyle => Style(
 
 Style get _normalStyle => Style(
   _container.color.ref($tok.color.grayDarker),
+  _label.color.ref($tok.color.white),
+  _icon.color.ref($tok.color.white)
+);
+
+Style get _normalLightStyle => Style(
+  _container.color.ref($tok.color.grayDark),
   _label.color.ref($tok.color.white),
   _icon.color.ref($tok.color.white)
 );
@@ -49,6 +55,7 @@ Style buttonStyle(Style? style, ButtonVariant? variant) {
     _baseStyle,
 
     ButtonVariant.normal(_normalStyle),
+    ButtonVariant.normalLight(_normalLightStyle),
     ButtonVariant.outlined(_outlinedStyle),
 
     $on.disabled(_onDisabled),

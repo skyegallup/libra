@@ -4,10 +4,14 @@ import 'package:flutter/widgets.dart';
 import 'package:libra/data/gemini_response.dart';
 import 'package:libra/services/gemini_client.dart';
 import 'package:libra/utils/gemtext_parser.dart';
+import 'package:libra/utils/themes/theme_tokens.dart';
+import 'package:libra/widgets/button/button.dart';
+import 'package:libra/widgets/button/button_variants.dart';
 import 'package:libra/widgets/gemtext_renderer/gemtext_renderer.dart';
 import 'package:libra/widgets/sidebar/sidebar.dart';
 import 'package:libra/widgets/text_field/text_field.dart';
 import 'package:libra/widgets/text_field/text_field_spec.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:mix/mix.dart';
 import 'package:provider/provider.dart';
 
@@ -38,18 +42,16 @@ class _HomePageState extends State<HomePage> {
             $box.padding(16, 24),
             $box.color(Color.fromRGBO(17, 17, 21, 1)),
             $flex.mainAxisAlignment.center(),
-            $flex.crossAxisAlignment.center()
+            $flex.crossAxisAlignment.center(),
+            $flex.gap(8)
           ),
           children: [
-            //PressableBox(
-            //  style: Style(
-            //    $box.padding(12, 20),
-            //    $box.color(Color.fromRGBO(29, 29, 34, 1)),
-            //    $box.width(720)
-            //  ),
-            //  onPress: () => _getCurrentUrl(context),
-            //  child: StyledText(url)
-            //)
+            LibraButton(
+              variant: ButtonVariant.normalLight,
+              label: '',
+              icon: LucideIcons.refreshCw,
+              onPressed: () => _getCurrentUrl(context),
+            ),
             LibraTextField(
               defaultValue: url,
               controller: _urlController,
@@ -133,7 +135,7 @@ class _HomePageState extends State<HomePage> {
     if (url == '') {
       return;
     }
-    
+
     setState(() {
       print('sending req...');
       _response = Provider.of<GeminiClient>(context, listen: false).get(url);
