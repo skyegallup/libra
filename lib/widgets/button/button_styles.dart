@@ -46,6 +46,17 @@ Style get _normalLightStyle => Style(
   $on.hover(_onHoverLight)
 );
 
+Style get _onHoverPrimary => Style(
+  _container.color.ref($tok.color.primary)
+);
+Style get _primaryStyle => Style(
+  _container.color.ref($tok.color.primaryDark),
+  _label.color.ref($tok.color.white),
+  _icon.color.ref($tok.color.white),
+
+  $on.hover(_onHoverPrimary)
+);
+
 Style get _outlinedStyle => Style(
   _normalStyle,
   _container.border.width(2),
@@ -65,6 +76,7 @@ Style buttonStyle(Style? style, ButtonVariant? variant) {
 
     ButtonVariant.normal(_normalStyle),
     ButtonVariant.normalLight(_normalLightStyle),
+    ButtonVariant.primary(_primaryStyle),
     ButtonVariant.outlined(_outlinedStyle),
 
     $on.disabled(_onDisabled)
