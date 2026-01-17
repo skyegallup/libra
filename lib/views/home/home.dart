@@ -1,17 +1,14 @@
 import 'dart:async';
-import 'dart:collection';
 
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:libra/data/gemini_request_event.dart';
 import 'package:libra/data/loading_state.dart';
 import 'package:libra/services/gemini_client.dart';
-import 'package:libra/utils/gemtext_parser.dart';
 import 'package:libra/utils/themes/theme_tokens.dart';
 import 'package:libra/widgets/button/button.dart';
 import 'package:libra/widgets/button/button_variants.dart';
-import 'package:libra/widgets/gemtext_renderer/gemtext_renderer.dart';
 import 'package:libra/widgets/loading_bar.dart';
+import 'package:libra/widgets/page.dart';
 import 'package:libra/widgets/sidebar/sidebar.dart';
 import 'package:libra/widgets/text_field/text_field.dart';
 import 'package:libra/widgets/text_field/text_field_spec.dart';
@@ -77,10 +74,7 @@ class _HomePageState extends State<HomePage> {
                     TextFieldSpecUtility.self.container.color.ref($tok.color.primaryDark),
                     TextFieldSpecUtility.self.container.width(720)
                   ),
-                  onSubmitted: (value) {
-                    _setUrl(value);
-                    _getCurrentUrl(context);
-                  }
+                  onSubmitted: (value) => navigate(context, value)
                 )
               ]
             ),
@@ -100,76 +94,26 @@ class _HomePageState extends State<HomePage> {
           ),
           children: [
             Sidebar(),
-
-            // Content
-            Expanded(
-              child: SingleChildScrollView(  // TODO: Try using a ListView of text items instead?
-                child: HBox(
-                  style: Style(
-                    $flex.mainAxisAlignment.center()
-                  ),
-                  children: [
-                    Box(
-                      style: Style(
-                        $box.maxWidth(720),
-                        $box.padding.vertical(24)
-                      ),
-                      child: StreamBuilder<GeminiRequestEvent>(
-                        stream: _response,
-                        builder: (BuildContext context, AsyncSnapshot<GeminiRequestEvent> snapshot) {
-                          if (snapshot.connectionState == ConnectionState.none) {
-                            return StyledText('Request not yet sent.');
-                          }
-
-                          if (snapshot.hasData) {
-                            final data = snapshot.data!;
-                            if (data.state != pageLoadingState) {
-                              SchedulerBinding.instance.addPostFrameCallback((Duration timestamp) {
-                                setState(() {
-                                  pageLoadingState = data.state;
-                                  showLoadingBar = data.state != LoadingState.complete;
-                                });
-                              });
-                            }
-
-                            if (data.state == LoadingState.idle) {
-                              return StyledText('Request not yet sent.');
-                            } else if (data.state == LoadingState.complete) {
-                              final response = data.response!;
-
-                              if (response.content == null) {
-                                return StyledText('<no content>');
-                              }
-                              var content = response.content!;
-                              
-                              var parser = GemtextParser();
-                              final parsedResponse = parser.parse(content);
-                              return GemtextRenderer(
-                                nodes: UnmodifiableListView(parsedResponse),
-                                onNavigate: (uri) {
-                                  _setUrl(uri);
-                                  _getCurrentUrl(context);
-                                },
-                              );
-                            }
-                          }
-
-                          if (snapshot.hasError) {
-                            return StyledText('Request failed.');
-                          }
-
-                          return StyledText('Waiting...');
-                        },
-                      )
-                    )
-                  ]
-                )
-              )
+            LibraPage(
+              requestEventStream: _response,
+              pageLoadingState: pageLoadingState,
+              onNavigate: (uri) => navigate(context, uri),
+              onLoadingStateChange: (LoadingState state) {
+                setState(() {
+                  pageLoadingState = state;
+                  showLoadingBar = state != LoadingState.complete;
+                });
+              },
             )
           ]
         )
       ]
     );
+  }
+
+  void navigate(BuildContext context, String uri) {
+    _setUrl(uri);
+    _getCurrentUrl(context);
   }
 
   void _getCurrentUrl(BuildContext context) {
@@ -186,7 +130,7 @@ class _HomePageState extends State<HomePage> {
   void _setUrl(String url) {
     setState(() {
       this.url = url;
-      this._urlController.text = url;
+      _urlController.text = url;
     });
   }
 }
