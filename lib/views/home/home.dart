@@ -178,7 +178,6 @@ class _HomePageState extends State<HomePage> {
     }
 
     setState(() {
-      print('sending req...');
       showLoadingBar = true;
       _response = Provider.of<GeminiClient>(context, listen: false).get(url);
     });
