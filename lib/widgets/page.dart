@@ -1,27 +1,22 @@
-import 'dart:async';
 import 'dart:collection';
 
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
-import 'package:libra/data/gemini_request_event.dart';
 import 'package:libra/data/loading_state.dart';
+import 'package:libra/data/page_state.dart';
+import 'package:libra/data/page_state_repository.dart';
 import 'package:libra/utils/gemtext_parser.dart';
 import 'package:libra/widgets/gemtext_renderer/gemtext_renderer.dart';
 import 'package:mix/mix.dart';
+import 'package:provider/provider.dart';
 
 class LibraPage extends StatelessWidget {
-  const LibraPage({
+  LibraPage({
     super.key,
-    required this.requestEventStream,
-    required this.pageLoadingState,
-    required this.onNavigate,
-    required this.onLoadingStateChange
+    required this.pageState
   });
 
-  final Stream<GeminiRequestEvent>? requestEventStream;
-  final LoadingState pageLoadingState;
-  final Function(String uri) onNavigate;
-  final Function(LoadingState state) onLoadingStateChange;
+  final PageState pageState;
+  final GemtextParser _parser = GemtextParser();
 
   @override
   Widget build(BuildContext context) {
@@ -37,49 +32,36 @@ class LibraPage extends StatelessWidget {
                 $box.maxWidth(720),
                 $box.padding.vertical(24)
               ),
-              child: StreamBuilder<GeminiRequestEvent>(
-                stream: requestEventStream,
-                builder: (BuildContext context, AsyncSnapshot<GeminiRequestEvent> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.none) {
-                    return StyledText('Request not yet sent.');
-                  }
-
-                  if (snapshot.hasData) {
-                    final data = snapshot.data!;
-                    if (data.state != pageLoadingState) {
-                      SchedulerBinding.instance.addPostFrameCallback((Duration timestamp) => onLoadingStateChange(data.state));
-                    }
-
-                    if (data.state == LoadingState.idle) {
-                      return StyledText('Request not yet sent.');
-                    } else if (data.state == LoadingState.complete) {
-                      final response = data.response!;
-
-                      if (response.content == null) {
-                        return StyledText('<no content>');
-                      }
-                      var content = response.content!;
-                      
-                      var parser = GemtextParser();
-                      final parsedResponse = parser.parse(content);
-                      return GemtextRenderer(
-                        nodes: UnmodifiableListView(parsedResponse),
-                        onNavigate: onNavigate,
-                      );
-                    }
-                  }
-
-                  if (snapshot.hasError) {
-                    return StyledText('Request failed.');
-                  }
-
-                  return StyledText('Waiting...');
-                },
-              )
+              child: _buildDisplayedContent(context)
             )
           ]
         )
       )
     );
+  }
+
+  Widget _buildDisplayedContent(BuildContext context) {
+    switch (pageState.loadingState) {
+      case (LoadingState.idle):
+        return StyledText('Request not yet sent.');
+      case (LoadingState.connecting):
+      case (LoadingState.dataTransfer):
+        return StyledText('Waiting...');
+      case (LoadingState.complete):
+        if (pageState.response?.content != null) {
+          var content = pageState.response!.content!;
+
+          final parsedResponse = _parser.parse(content);
+          return GemtextRenderer(
+            nodes: UnmodifiableListView(parsedResponse),
+            onNavigate: (uri) {
+              final repo = Provider.of<PageStateRepository>(context, listen: false);
+              repo.navigatePage(pageState, uri);
+            },
+          );
+        } else {
+          return StyledText('<no content>');
+        }
+    }
   }
 }

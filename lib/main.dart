@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:libra/data/page_state_repository.dart';
 import 'package:libra/services/gemini_client.dart';
 import 'package:libra/utils/themes/theme_light_blue.dart';
 import 'package:libra/views/home/home.dart';
@@ -14,12 +15,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        Provider(create: (_) => GeminiClient())
-      ],
-      child: MixTheme(
-        data: themeLightBlue,
+    return MixTheme(
+      data: themeLightBlue,
+      child: MultiProvider(
+        providers: [
+          Provider(create: (_) => GeminiClient()),
+          ChangeNotifierProvider(create: (context) => PageStateRepository(geminiClient: context.read()))
+        ],
         child: WidgetsApp(
           title: 'Libra',
           home: const HomePage(),

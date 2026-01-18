@@ -17,9 +17,10 @@ Style get _baseStyle => Style(
   _flex.gap(8),
   _flex.mainAxisAlignment.center(),
   _flex.crossAxisAlignment.center(),
-  _flex.mainAxisSize.min(),
+  _flex.mainAxisSize.max(),
 
   _label.style.ref($tok.textStyle.link),
+  _label.wrap.expanded(),
 
   _icon.size(24)
 );
